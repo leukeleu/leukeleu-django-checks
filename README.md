@@ -19,3 +19,9 @@ Add `'leukeleu_django_checks'` to `INSTALLED_APPS`.
 * `leukeleu.W006`: Check if `sentry-sdk` is configured correctly
 
 Run `./manage.py check --deploy` to execute these checks (in addition to Django's default set).
+
+## List superusers
+
+Run `./manage.py list_superusers` to print a list of all (in)active superusers.
+
+The name of each superuser is printed with a "+" (active) or "-" (inactive) prefix.
