@@ -19,7 +19,7 @@ W002 = Warning(
     " `bandit.backends.smtp.HijackSMTPBackend`."
     " This is not recommended for production.",
     hint=(
-        "Disable this warning in production by adding leukeleu.W002"
+        "Disable this warning in testing/staging by adding leukeleu.W002"
         " to SILENCED_SYSTEM_CHECKS."
     ),
     id="leukeleu.W002",
@@ -28,9 +28,9 @@ W002 = Warning(
 W003 = Warning(
     "You have not set the `EMAIL_BACKEND` setting to"
     " `bandit.backends.smtp.HijackSMTPBackend`."
-    " This is recommended for non production environments.",
+    " Using django-email-bandit is recommended for non-production environments.",
     hint=(
-        "Disable this warning in testing/staging by adding leukeleu.W003"
+        "Disable this warning in production by adding leukeleu.W003"
         " to SILENCED_SYSTEM_CHECKS."
     ),
     id="leukeleu.W003",
