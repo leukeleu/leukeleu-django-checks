@@ -1,4 +1,5 @@
 include .editorconfig
+include .flake8
 include Makefile
 include manage.py
 include runtests.py
