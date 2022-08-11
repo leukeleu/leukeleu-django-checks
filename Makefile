@@ -1,4 +1,4 @@
-.PHONY: test devinstall unittests coveragetest coverage flaketest checkmanifest clean build check_tag release
+.PHONY: test devinstall unittests coveragetest coverage flaketest checkmanifest checktypeannotations clean build check_tag release
 
 test: flaketest checktypeannotations coveragetest checkmanifest
 
@@ -26,8 +26,10 @@ checkmanifest:
 	# Check if all files are included in the sdist
 	check-manifest
 
+MYPY := $(shell command -v mypy 2> /dev/null)
 checktypeannotations:
-	mypy
+	@[ ${MYPY} ] && mypy || echo "mypy not installed"
+
 
 clean:
 	# Remove build/dist dirs
