@@ -1,6 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand
+
+if TYPE_CHECKING:  # pragma: no cover
+    from typing import Any
 
 STATUS_FLAGS = {
     True: "+",
@@ -8,13 +16,13 @@ STATUS_FLAGS = {
 }
 
 
-def get_name(user, email_field):
+def get_name(user: AbstractUser, email_field: str) -> str:
     name = user.get_full_name() or getattr(user, email_field) or user.get_username()
     return name.partition("@")[0]
 
 
 class Command(BaseCommand):
-    def handle(self, *args, **options):
+    def handle(self, *args: Any, **options: Any) -> None:
         try:
             user_model = get_user_model()
         except ImproperlyConfigured:

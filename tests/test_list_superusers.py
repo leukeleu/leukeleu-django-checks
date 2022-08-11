@@ -12,7 +12,7 @@ class TestListSuperusersNoAuth(TestCase):
         "leukeleu_django_checks",
     ]
 
-    def test_no_user_model(self):
+    def test_no_user_model(self) -> None:
         out = StringIO()
         call_command("list_superusers", stdout=out, stderr=out)
         self.assertEqual(out.getvalue(), "")
@@ -22,7 +22,7 @@ class TestListSuperusersNoAuth(TestCase):
 class TestListSuperusersCustomUserModel(TestCase):
     """Does nothing if AUTH_USER_MODEL does not have an is_superuser field"""
 
-    def test_no_superuser_field(self):
+    def test_no_superuser_field(self) -> None:
         user_model = get_user_model()
         user_model.objects.create()
 
@@ -32,7 +32,7 @@ class TestListSuperusersCustomUserModel(TestCase):
 
 
 class TestListSuperusersStandardUserModel(TestCase):
-    def test_default_user_model(self):
+    def test_default_user_model(self) -> None:
         user_model = get_user_model()
 
         user_model.objects.create_superuser(
