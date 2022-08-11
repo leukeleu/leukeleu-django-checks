@@ -1,6 +1,6 @@
 .PHONY: test devinstall unittests coveragetest coverage flaketest checkmanifest clean build check_tag release
 
-test: flaketest coveragetest checkmanifest
+test: flaketest checktypeannotations coveragetest checkmanifest
 
 devinstall:
 	pip install --upgrade --upgrade-strategy eager -e .[test]
@@ -25,6 +25,9 @@ flaketest:
 checkmanifest:
 	# Check if all files are included in the sdist
 	check-manifest
+
+checktypeannotations:
+	mypy
 
 clean:
 	# Remove build/dist dirs
