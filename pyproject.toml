@@ -52,3 +52,20 @@ src_paths = [
     "leukeleu_django_checks",
     "tests",
 ]
+
+[tool.mypy]
+strict = true  # Enable optional error checks
+warn_unreachable = true  # Warn about unreachable code
+pretty = true  # Show formatted code on error
+show_error_context = true
+plugins = [
+    "mypy_django_plugin.main",
+]
+python_version = 3.8
+files = [
+    "leukeleu_django_checks",
+    "tests",
+]
+
+[tool.django-stubs]
+django_settings_module = "tests.test_settings"

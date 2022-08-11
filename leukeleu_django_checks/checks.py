@@ -1,5 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.conf import settings
-from django.core.checks import Warning, register
+from django.core.checks import Warning, registry
+
+if TYPE_CHECKING:  # pragma: no cover
+    from typing import Any, List
+
+    from django.apps.registry import Apps
 
 
 class Tags:
@@ -56,8 +65,7 @@ W006 = Warning(
 )
 
 
-@register(Tags.files)
-def check_file_upload_permissions(app_configs, **kwargs):
+def check_file_upload_permissions(app_configs: Apps, **kwargs: Any) -> List[Warning]:
     """
     Make sure FILE_UPLOAD_PERMISSIONS is set to 0o644 (the default since Django 3.2)
     """
@@ -67,8 +75,7 @@ def check_file_upload_permissions(app_configs, **kwargs):
         return []
 
 
-@register(Tags.email, deploy=True)
-def check_email_backend(app_configs, **kwargs):
+def check_email_backend(app_configs: Apps, **kwargs: Any) -> List[Warning]:
     """
     Make sure EMAIL_BACKEND is (not) set to bandit.backends.smtp.HijackSMTPBackend
     """
@@ -83,8 +90,7 @@ def check_email_backend(app_configs, **kwargs):
         return [W003]
 
 
-@register(Tags.wagtail, deploy=True)
-def check_wagtail_update_check(app_configs, **kwargs):
+def check_wagtail_update_check(app_configs: Apps, **kwargs: Any) -> List[Warning]:
     """
     Make sure WAGTAIL_ENABLE_UPDATE_CHECK is set to False when wagtail is installed
     """
@@ -97,13 +103,12 @@ def check_wagtail_update_check(app_configs, **kwargs):
         return []
 
 
-@register(Tags.sentry, deploy=True)
-def check_sentry_dsn(app_configs, **kwargs):
+def check_sentry_dsn(app_configs: Apps, **kwargs: Any) -> List[Warning]:
     """
     Make sure sentry-sdk is installed and configured correctly
     """
     try:
-        import sentry_sdk
+        import sentry_sdk  # type: ignore
     except ImportError:
         return [W005]
     if sentry_sdk.Hub.current.client is None or not bool(
@@ -112,3 +117,16 @@ def check_sentry_dsn(app_configs, **kwargs):
         return [W006]
     else:
         return []
+
+
+# Register checks
+#
+# Do not use the @register decorator as it is typed as Any in
+# django-stubs. This results in mypy errors about the checks
+# becoming untyped when using the decorator.
+# https://github.com/typeddjango/django-stubs/issues/1098
+
+registry.register(check_file_upload_permissions, Tags.files)
+registry.register(check_email_backend, Tags.email, deploy=True)
+registry.register(check_wagtail_update_check, Tags.wagtail, deploy=True)
+registry.register(check_sentry_dsn, Tags.sentry, deploy=True)
