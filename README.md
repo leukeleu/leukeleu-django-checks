@@ -17,6 +17,7 @@ Add `'leukeleu_django_checks'` to `INSTALLED_APPS`.
   * This check only runs if wagtail is installed
 * `leukeleu.W005`: Check if `sentry-sdk` is installed
 * `leukeleu.W006`: Check if `sentry-sdk` is configured correctly
+* `leukeleu.W007`: Make sure there is no `/admin` or `/admin/` url
 
 Run `./manage.py check --deploy` to execute these checks (in addition to Django's default set).
 

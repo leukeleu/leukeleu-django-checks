@@ -108,3 +108,17 @@ class TestCheckSentryDSN(SimpleTestCase):
             ),
         ):
             self.assertEqual([], checks.check_sentry_dsn(None))
+
+
+class TestCheckAdminUrl(SimpleTestCase):
+    @override_settings(
+        ROOT_URLCONF="tests.urls.urls",
+    )
+    def test_no_admin_url(self):
+        self.assertEqual([], checks.check_admin_url(None))
+
+    @override_settings(
+        ROOT_URLCONF="tests.urls.admin_urls",
+    )
+    def test_with_admin_url(self):
+        self.assertEqual([checks.W007], checks.check_admin_url(None))

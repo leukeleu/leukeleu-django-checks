@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.checks import Warning, register
+from django.urls import Resolver404, resolve
 
 
 class Tags:
@@ -7,6 +8,7 @@ class Tags:
     wagtail = "wagtail"
     files = "files"
     sentry = "sentry"
+    urls = "urls"
 
 
 W001 = Warning(
@@ -53,6 +55,11 @@ W006 = Warning(
     "The sentry-sdk package is installed but you have not configured a DSN."
     " This is required in order for application errors to be sent to Sentry.",
     id="leukeleu.W006",
+)
+
+W007 = Warning(
+    "Your URL patterns contain a /admin/ URL. This is not recommended.",
+    id="leukeleu.W007",
 )
 
 
@@ -110,5 +117,21 @@ def check_sentry_dsn(app_configs, **kwargs):
         sentry_sdk.Hub.current.client.dsn
     ):
         return [W006]
+    else:
+        return []
+
+
+@register(Tags.urls, deploy=True)
+def check_admin_url(app_configs, **kwargs):
+    """
+    Make sure /admin or /admin/ is not used in URL patterns
+    """
+    for path in ["/admin", "/admin/"]:
+        try:
+            resolve(path)
+        except Resolver404:
+            continue
+        else:
+            return [W007]
     else:
         return []
