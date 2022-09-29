@@ -138,11 +138,12 @@ def check_admin_url(app_configs, **kwargs):
     """
     for path in ["/admin", "/admin/"]:
         try:
-            resolve(path)
+            match = resolve(path)
         except Resolver404:
             continue
         else:
-            return [W007]
+            if match.route.strip("/") == "admin":
+                return [W007]
     else:
         return []
 
