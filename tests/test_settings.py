@@ -28,6 +28,10 @@ LOGGING = {
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(PACKAGE_DIR)
 
+SILENCED_SYSTEM_CHECKS = [
+    "leukeleu.I008",  # leukeleu-django-gdpr is not actually installed
+]
+
 SECRET_KEY = "django-insecure-test-secret-key"
 
 USE_TZ = True

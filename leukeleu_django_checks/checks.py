@@ -1,9 +1,10 @@
 from django.conf import settings
-from django.core.checks import Warning, register
+from django.core.checks import Info, Warning, register
 from django.urls import Resolver404, resolve
 
 
 class Tags:
+    confidentiality = "confidentiality"
     email = "email"
     wagtail = "wagtail"
     files = "files"
@@ -60,6 +61,15 @@ W006 = Warning(
 W007 = Warning(
     "Your URL patterns contain a /admin/ URL. This is not recommended.",
     id="leukeleu.W007",
+)
+
+I008 = Info(
+    "Your project does not have the leukeleu-django-gdpr package installed.",
+    hint=(
+        "Install the leukeleu-django-gdpr package and add"
+        " 'leukeleu_django_gdpr' to INSTALLED_APPS."
+    ),
+    id="leukeleu.I008",
 )
 
 
@@ -133,5 +143,16 @@ def check_admin_url(app_configs, **kwargs):
             continue
         else:
             return [W007]
+    else:
+        return []
+
+
+@register(Tags.confidentiality)
+def check_gdpr(app_configs, **kwargs):
+    """
+    Make sure leukeleu-django-gdpr is installed and configured correctly
+    """
+    if "leukeleu_django_gdpr" not in settings.INSTALLED_APPS:
+        return [I008]
     else:
         return []

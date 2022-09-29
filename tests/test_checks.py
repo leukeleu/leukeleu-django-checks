@@ -122,3 +122,24 @@ class TestCheckAdminUrl(SimpleTestCase):
     )
     def test_with_admin_url(self):
         self.assertEqual([checks.W007], checks.check_admin_url(None))
+
+
+class TestCheckGdpr(SimpleTestCase):
+    def setUp(self):
+        patch_sys_modules = mock.patch.dict(
+            "sys.modules",
+            {
+                "leukeleu_django_gdpr": importlib.import_module(
+                    "tests.mocks.mock_leukeleu_django_gdpr"
+                ),
+            },
+        )
+        patch_sys_modules.start()
+        self.addCleanup(patch_sys_modules.stop)
+
+    def test_no_gdpr_in_installed_apps(self):
+        self.assertEqual([checks.I008], checks.check_gdpr(None))
+
+    @modify_settings(INSTALLED_APPS={"append": "leukeleu_django_gdpr"})
+    def test_with_gdpr_installed(self):
+        self.assertEqual([], checks.check_gdpr(None))
