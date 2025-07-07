@@ -27,3 +27,9 @@ Run `./manage.py check --deploy` to execute these checks (in addition to Django'
 Run `./manage.py list_superusers` to print a list of all (in)active superusers.
 
 The name of each superuser is printed with a "+" (active) or "-" (inactive) prefix.
+
+## List staff users
+
+Run `./manage.py list_staff_users` to print a list of all (in)active staff users.
+
+The name of each staff user is printed with a "+" (active) or "-" (inactive) prefix.
