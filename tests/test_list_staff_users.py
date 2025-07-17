@@ -57,7 +57,7 @@ class TestListStaffUsersStandardUserModel(TestCase):
         call_command("list_staff_users", stdout=out, stderr=out)
         self.assertEqual(
             out.getvalue(),
-            "\n".join(
+            "\n".join(  # noqa: FLY002
                 [
                     "-John Smith",  # Prefers get_full_name
                     "+staff.user",  # Uses email field, removes domain part.

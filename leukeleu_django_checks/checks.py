@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.checks import Info, Warning, register
+from django.core import checks
 from django.urls import Resolver404, resolve
 
 
@@ -12,12 +12,12 @@ class Tags:
     urls = "urls"
 
 
-W001 = Warning(
+W001 = checks.Warning(
     "You have not set the `FILE_UPLOAD_PERMISSIONS` setting to `0o644`.",
     id="leukeleu.W001",
 )
 
-W002 = Warning(
+W002 = checks.Warning(
     "You have set the `EMAIL_BACKEND` setting to"
     " `bandit.backends.smtp.HijackSMTPBackend`."
     " This is not recommended for production.",
@@ -28,7 +28,7 @@ W002 = Warning(
     id="leukeleu.W002",
 )
 
-W003 = Warning(
+W003 = checks.Warning(
     "You have not set the `EMAIL_BACKEND` setting to"
     " `bandit.backends.smtp.HijackSMTPBackend`."
     " Using django-email-bandit is recommended for non-production environments.",
@@ -39,31 +39,31 @@ W003 = Warning(
     id="leukeleu.W003",
 )
 
-W004 = Warning(
+W004 = checks.Warning(
     "You have not set the `WAGTAIL_ENABLE_UPDATE_CHECK` setting to `False`."
     " Besides checking for updates, this also provides the Wagtail team with"
     " the hostname of the project. Therefore it needs to be disabled.",
     id="leukeleu.W004",
 )
 
-W005 = Warning(
+W005 = checks.Warning(
     "The sentry-sdk package is not installed. You must install and configure"
     " sentry-sdk in order for application errors to be sent to Sentry.",
     id="leukeleu.W005",
 )
 
-W006 = Warning(
+W006 = checks.Warning(
     "The sentry-sdk package is installed but you have not configured a DSN."
     " This is required in order for application errors to be sent to Sentry.",
     id="leukeleu.W006",
 )
 
-W007 = Warning(
+W007 = checks.Warning(
     "Your URL patterns contain a /admin/ URL. This is not recommended.",
     id="leukeleu.W007",
 )
 
-I008 = Info(
+I008 = checks.Info(
     "Your project does not have the leukeleu-django-gdpr package installed.",
     hint=(
         "Install the leukeleu-django-gdpr package and add"
@@ -73,18 +73,19 @@ I008 = Info(
 )
 
 
-@register(Tags.files)
+@checks.register(Tags.files)
 def check_file_upload_permissions(app_configs, **kwargs):
     """
     Make sure FILE_UPLOAD_PERMISSIONS is set to 0o644 (the default since Django 3.2)
     """
-    if getattr(settings, "FILE_UPLOAD_PERMISSIONS", None) != 0o644:
+    default_permissions = 0o644
+    if getattr(settings, "FILE_UPLOAD_PERMISSIONS", None) != default_permissions:
         return [W001]
     else:
         return []
 
 
-@register(Tags.email, deploy=True)
+@checks.register(Tags.email, deploy=True)
 def check_email_backend(app_configs, **kwargs):
     """
     Make sure EMAIL_BACKEND is (not) set to bandit.backends.smtp.HijackSMTPBackend
@@ -100,7 +101,7 @@ def check_email_backend(app_configs, **kwargs):
         return [W003]
 
 
-@register(Tags.wagtail, deploy=True)
+@checks.register(Tags.wagtail, deploy=True)
 def check_wagtail_update_check(app_configs, **kwargs):
     """
     Make sure WAGTAIL_ENABLE_UPDATE_CHECK is set to False when wagtail is installed
@@ -114,13 +115,13 @@ def check_wagtail_update_check(app_configs, **kwargs):
         return []
 
 
-@register(Tags.sentry, deploy=True)
+@checks.register(Tags.sentry, deploy=True)
 def check_sentry_dsn(app_configs, **kwargs):
     """
     Make sure sentry-sdk is installed and configured correctly
     """
     try:
-        import sentry_sdk
+        import sentry_sdk  # noqa: PLC0415
     except ImportError:
         return [W005]
     if sentry_sdk.Hub.current.client is None or not bool(
@@ -131,7 +132,7 @@ def check_sentry_dsn(app_configs, **kwargs):
         return []
 
 
-@register(Tags.urls, deploy=True)
+@checks.register(Tags.urls, deploy=True)
 def check_admin_url(app_configs, **kwargs):
     """
     Make sure /admin or /admin/ is not used in URL patterns
@@ -139,16 +140,15 @@ def check_admin_url(app_configs, **kwargs):
     for path in ["/admin", "/admin/"]:
         try:
             match = resolve(path)
-        except Resolver404:
+        except Resolver404:  # noqa: PERF203
             continue
         else:
             if match.route.strip("/") == "admin":
                 return [W007]
-    else:
-        return []
+    return []
 
 
-@register(Tags.confidentiality)
+@checks.register(Tags.confidentiality)
 def check_gdpr(app_configs, **kwargs):
     """
     Make sure leukeleu-django-gdpr is installed and configured correctly
