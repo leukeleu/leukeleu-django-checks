@@ -19,6 +19,12 @@ classifiers = [
   "Programming Language :: Python :: 3",
 ]
 
+[dependency-groups]
+dev = [
+  "coverage[toml]~=7.2",
+  "ruff~=0.11.6",
+]
+
 [build-system]
 requires = [
     "hatchling",
@@ -172,9 +178,3 @@ fail_under = 95
 
 [tool.coverage.html]
 directory = "var/htmlcov"
-
-[dependency-groups]
-dev = [
-  "ruff~=0.11.6",
-  "coverage[toml]~=7.2",
-]
