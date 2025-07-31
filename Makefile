@@ -1,42 +1,65 @@
-.PHONY: test devinstall unittests coveragetest coverage flaketest checkmanifest clean build check_tag release
+.PHONY: help
+help:
+	@echo "The following commands are meant to be run inside the python container:"
+	@echo
+	@echo "  make test - Run lint"
+	@echo "  make lint - Check syntax and style"
+	@echo "  make lintfix - Automatically fix syntax and style issues"
+	@echo "  make build - Build the package"
+	@echo
 
-test: flaketest coveragetest checkmanifest
+GITHUB_ACTIONS ?= false
 
-devinstall:
-	pip install --upgrade --upgrade-strategy eager -e .[test]
+# Helper function to define a GitHub Actions group
+define group
+	@if [ "$(GITHUB_ACTIONS)" = "true" ]; then \
+		echo "::group::$1"; \
+	fi
+endef
 
+.PHONY: test
+test: coveragetest
+
+.PHONY: lint
+lint:
+	# Check syntax and style
+	$(call group,Checking syntax and style)
+	uv run ruff check
+	uv run ruff format --check --diff
+	$(call endgroup)
+
+.PHONY: unittests
 unittests:
 	# Run unit tests with coverage
-	coverage run ./runtests.py
+	uv run coverage run ./runtests.py
 
+.PHONY: coveragetest
 coveragetest: unittests
 	# Generate coverage report and require minimum coverage
-	coverage report
+	uv run coverage report
 
+.PHONY: coverage
 coverage: unittests
 	# Generate test coverage html report
-	coverage html
+	uv run coverage html
 	@echo "Coverage report is located at ./var/htmlcov/index.html"
 
-flaketest:
-	# Check syntax and style
-	flake8
+.PHONY: lintfix
+lintfix:
+	# Automatically fix syntax and style issues
+	uv run ruff check --fix-only
+	uv run ruff format
 
-checkmanifest:
-	# Check if all files are included in the sdist
-	check-manifest
-
+.PHONY: clean
 clean:
-	# Remove build/dist dirs
-	rm -rf build dist
+	# Clean up build files
+	$(call group,Cleaning up)
+	rm -rf dist/*.whl dist/*.tar.gz
+	$(call endgroup)
 
-build: test clean
-	# Test, clean and build
-	python setup.py build sdist bdist_wheel
-
-check_tag:
-	@echo "Did you bump the version number and tag a new version? [y/N] " && read ans && [ $${ans:-N} = y ]
-
-release: check_tag build
-	# Build and upload to PyPI
-	twine upload dist/*
+.PHONY: build
+build: clean
+	# Build the package
+	$(call group,Building package)
+	uv build
+	$(call endgroup)

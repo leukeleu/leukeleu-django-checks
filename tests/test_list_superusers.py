@@ -55,7 +55,7 @@ class TestListSuperusersStandardUserModel(TestCase):
         call_command("list_superusers", stdout=out, stderr=out)
         self.assertEqual(
             out.getvalue(),
-            "\n".join(
+            "\n".join(  # noqa: FLY002
                 [
                     "+admin",  # Uses username field, if nothing else is available
                     "-John Smith",  # Prefers get_full_name
