@@ -143,3 +143,13 @@ class TestCheckGdpr(SimpleTestCase):
     @modify_settings(INSTALLED_APPS={"append": "leukeleu_django_gdpr"})
     def test_with_gdpr_installed(self):
         self.assertEqual([], checks.check_gdpr(None))
+
+
+class TestCheckEmailHost(SimpleTestCase):
+    @override_settings(EMAIL_HOST="smtp.eu.sparkpostmail.com")
+    def test_correct_email_host(self):
+        self.assertEqual([], checks.check_email_host(None))
+
+    @override_settings(EMAIL_HOST="localhost")
+    def test_wrong_email_host(self):
+        self.assertEqual([checks.W009], checks.check_email_host(None))
