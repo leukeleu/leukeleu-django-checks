@@ -73,9 +73,11 @@ I008 = checks.Info(
 )
 
 W009 = checks.Warning(
-    "Your project is sending out emails but is not using Spark Post. Please configure EMAIL_HOST to use Spark Post.",
+    "Your project is sending out emails but is not using SparkPost."
+    " Please configure EMAIL_HOST to use SparkPost.",
     id="leukeleu.W009",
 )
+
 
 @checks.register(Tags.files)
 def check_file_upload_permissions(app_configs, **kwargs):
@@ -166,10 +168,10 @@ def check_gdpr(app_configs, **kwargs):
 @checks.register(Tags.email, deploy=True)
 def check_email_host(app_configs, **kwargs):
     """
-    Make sure that projects that are sending out emails are using Spark Post.
+    Make sure that projects that are sending out emails are using SparkPost.
     """
-    if (
-         hasattr(settings, "EMAIL_HOST") and not settings.EMAIL_HOST.endswith("sparkpostmail.com")
+    if hasattr(settings, "EMAIL_HOST") and not settings.EMAIL_HOST.endswith(
+        "sparkpostmail.com"
     ):
         return [W009]
     else:
