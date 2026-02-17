@@ -7,7 +7,7 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "Django>=4.2,<6",
+    "Django>=4.2",
 ]
 readme = "README.md"
 license = "MIT"
@@ -22,8 +22,8 @@ classifiers = [
 
 [dependency-groups]
 dev = [
-  "coverage[toml]~=7.2",
-  "ruff~=0.14.8",
+  "coverage[toml]~=7.13.4",
+  "ruff~=0.15.1",
 ]
 
 [build-system]
@@ -94,6 +94,7 @@ unfixable = [
   "PLR0904",  # too many public methods
   "PLR2004",  # magic values
   "PLR6301",  # methods do not have to use self
+  "RUF067",  # mocked init modules have definitions
   "S105", "S106", "S107",  # hardcoded passwords
   "S311",  # pseudo-random number generators
 ]
